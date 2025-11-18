@@ -51,45 +51,42 @@ function App() {
       };
 
       return (
-        <div style={{ maxWidth: 800, margin: "2rem auto", fontFamily: "sans-serif" }}>
-          <h1>LoL Match History</h1>
+        <div className="app">
+          <h1 className="app-title">LoL Match History</h1>
 
-          <div style={{ marginBottom: "1rem" }}>
-            <label>
-              Name:{" "}
-              <input value={name} onChange={(e) => setName(e.target.value)} />
-            </label>{" "}
-            <label>
-              Tag:{" "}
-              <input value={tag} onChange={(e) => setTag(e.target.value)} />
-            </label>{" "}
-            <label>
-              Region:{" "}
-              <select value={region} onChange={(e) => setRegion(e.target.value)}>
+          <div className="controls">
+            <label className="field">
+              <span>Name:</span>
+              <input value={name} onChange={(e) => setName(e.target.value)} className="input"/>
+            </label>
+
+            <label className="field">
+              <span>Tag:</span>
+              <input value={tag} onChange={(e) => setTag(e.target.value)} className="input"/>
+            </label>
+
+            <label className="field">
+              <span>Region:</span>
+              <select value={region} onChange={(e) => setRegion(e.target.value)} className="select">
                 <option value="EUROPE">EUROPE</option>
                 <option value="AMERICAS">AMERICAS</option>
                 <option value="ASIA">ASIA</option>
               </select>
-            </label>{" "}
-            <button onClick={loadMatches} disabled={loading}>
+            </label>
+
+            <button onClick={loadMatches} disabled={loading} className="button button-primary">
               {loading ? "Loading..." : "Load Match History"}
             </button>
           </div>
 
-          {error && (
-            <div style={{ color: "red", marginBottom: "1rem" }}>
+          {error &&
+            <div className="error">
               Error: {error}
             </div>
-          )}
+          }
 
           {matches.length > 0 && (
-            <table
-              style={{
-                width: "100%",
-                borderCollapse: "collapse",
-                marginTop: "1rem",
-              }}
-            >
+            <table className="matches-table">
               <thead>
                 <tr>
                   <th style={{ borderBottom: "1px solid #ccc", textAlign: "left" }}>Champion</th>
@@ -107,7 +104,7 @@ function App() {
                     <td>
                       {m.kills} / {m.deaths} / {m.assists}
                     </td>
-                    <td style={{ color: m.win ? "green" : "red" }}>
+                    <td className={m.win ? "win" : "loss"}>
                       {m.win ? "Win" : "Loss"}
                     </td>
                     <td>{Math.round(m.durationSeconds / 60)} min</td>
@@ -118,7 +115,7 @@ function App() {
           )}
 
           {!loading && !error && matches.length === 0 && (
-            <p>No matches loaded yet. Try searching!</p>
+            <p className="empty-message">No matches loaded yet. Try searching!</p>
           )}
         </div>
       );
