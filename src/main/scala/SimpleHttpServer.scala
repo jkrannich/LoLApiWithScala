@@ -7,12 +7,10 @@ class SimpleHttpServer(port: Int):
   private val server: HttpServer = HttpServer.create(new InetSocketAddress(port), 0)
 
   def get(path: String)(handler: HttpExchange => Unit): Unit =
-    server.createContext(path, new HttpHandler:
-      override def handle(exchange: HttpExchange): Unit =
-        if exchange.getRequestMethod == "GET" then
-          handler(exchange)
-        else
-          sendResponse(exchange, 405, "Method not allowed")
+    server.createContext(path, (exchange: HttpExchange) => if exchange.getRequestMethod == "GET" then
+      handler(exchange)
+    else
+      sendResponse(exchange, 405, "Method not allowed")
     )
 
   def start(): Unit = {
