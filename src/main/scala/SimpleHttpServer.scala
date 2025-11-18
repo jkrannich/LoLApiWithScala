@@ -15,6 +15,12 @@ class SimpleHttpServer(port: Int):
           sendResponse(exchange, 405, "Method not allowed")
     )
 
+  def start(): Unit = {
+    server.setExecutor(null)
+    server.start()
+    println(s"Http server running at http://localhost:$port")
+  }
+
   private def sendResponse(exchange: HttpExchange, status: Int, body: String): Unit =
     val bytes = body.getBytes(StandardCharsets.UTF_8)
     exchange.getResponseHeaders.add("Content-Type", "application/json")
