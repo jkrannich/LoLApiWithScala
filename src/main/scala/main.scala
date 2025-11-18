@@ -3,7 +3,9 @@ import core.config.Regions.{PlatformRegion, RegionalRoute}
 import core.config.RiotApiConfig
 import core.http.JavaNetRiotHttp
 import io.github.cdimascio.dotenv.Dotenv
+import wrapper.domain.MatchSummary
 import wrapper.mapping.MatchMapper
+import wrapper.service.RiotLeagueService
 
 import java.time.Duration
 
@@ -16,6 +18,7 @@ def main(): Unit = {
 
   val riotHttp = new JavaNetRiotHttp(config)
   val riotApi = new RiotApi(riotHttp)
+  val service = new RiotLeagueService(riotApi)
 
   /*
   val account = riotApi.account().byRiotId(RegionalRoute.EUROPE, "Thayger", "Soul")
@@ -33,17 +36,39 @@ def main(): Unit = {
         val region = params.getOrElse("region", "EUROPE")
         val limit = params.get("limit").map(_.toInt).getOrElse(5)
 
+        if name.isEmpty || tag.isEmpty then
+          server.sendResponse(exchange, 400, """{"error":"Missing name or tag"}""")
+
         val regional = RegionalRoute.valueOf(region)
 
-        val account = riotApi.account().byRiotId(regional, "thayger", "soul")
+        val summaries = service.getMatchHistory(regional, name, tag, limit)
 
-        val puuid = account.puuid()
+        val sb = new StringBuilder
+        sb.append("[")
 
-        val matchIds = riotApi.`match`().getListOfMatchIdsByPuuid(regional, puuid, 0, limit)
+        val it = summaries.iterator()
+        var idx = 0
+        while it.hasNext do
+          val s = it.next()
 
-        println(account)
-        println(matchIds)
+          if idx > 0 then sb.append(",")
 
+          sb.append("{")
+          sb.append("\"matchId\":\"").append(s.matchId()).append("\",")
+          sb.append("\"gameMode\":\"").append(s.gameMode()).append("\",")
+          sb.append("\"durationSeconds\":").append(s.durationSeconds()).append(",")
+          sb.append("\"champion\":\"").append(s.champion()).append("\",")
+          sb.append("\"kills\":").append(s.kills()).append(",")
+          sb.append("\"deaths\":").append(s.deaths()).append(",")
+          sb.append("\"assists\":").append(s.assists()).append(",")
+          sb.append("\"win\":").append(s.win())
+          sb.append("}")
+
+          idx += 1
+
+        sb.append("]")
+
+        server.sendResponse(exchange, 200, sb.toString)
       catch
         case e: Exception =>
           e.printStackTrace()
