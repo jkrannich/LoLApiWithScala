@@ -21,7 +21,7 @@ class SimpleHttpServer(port: Int):
     println(s"Http server running at http://localhost:$port")
   }
 
-  private def sendResponse(exchange: HttpExchange, status: Int, body: String): Unit =
+  def sendResponse(exchange: HttpExchange, status: Int, body: String): Unit =
     val bytes = body.getBytes(StandardCharsets.UTF_8)
     exchange.getResponseHeaders.add("Content-Type", "application/json")
     exchange.sendResponseHeaders(status, bytes.length)

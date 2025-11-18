@@ -8,7 +8,7 @@ import java.time.Duration
 
 @main
 def main(): Unit = {
-  val dotenv = Dotenv.load()
+  /*val dotenv = Dotenv.load()
   val apiKey = dotenv.get("RIOT_API_KEY")
 
   val config = new RiotApiConfig(apiKey, PlatformRegion.EUW1, RegionalRoute.EUROPE, Duration.ofSeconds(10))
@@ -18,5 +18,14 @@ def main(): Unit = {
 
   val account = riotApi.account().byRiotId(RegionalRoute.EUROPE, "Thayger", "Soul")
   println(account)
+  */
+
+  val server = new SimpleHttpServer(8080)
+
+  server.get("/dummy") {
+    exchange => server.sendResponse(exchange, 200, """{"status":"ok"}""")
+  }
+
+  server.start()
 }
 
