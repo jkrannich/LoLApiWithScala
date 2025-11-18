@@ -1,5 +1,6 @@
 import com.sun.net.httpserver.{HttpExchange, HttpHandler, HttpServer}
-import java.net.InetSocketAddress
+
+import java.net.{InetSocketAddress, URLDecoder}
 import java.nio.charset.StandardCharsets
 
 class SimpleHttpServer(port: Int):
@@ -26,5 +27,15 @@ class SimpleHttpServer(port: Int):
     val os = exchange.getResponseBody
     os.write(bytes)
     os.close()
+
+  def queryParams(exchange: HttpExchange): Map[String, String] =
+    val query = Option(exchange.getRequestURI.getQuery).getOrElse("")
+    query.split("&")
+      .filter(_.contains("="))
+      .map { pair =>
+        val Array(k, v) = pair.split("=", 2)
+        k -> URLDecoder.decode(v, "UTF-8")
+      }
+      .toMap
 
 
