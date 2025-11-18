@@ -102,3 +102,38 @@
   margin-top: 1rem;
   color: #6b7280;
 }
+
+.summoner-card {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    background: #0f172a;
+    color: #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.summoner-main {
+    display: flex;
+    flex-direction: column;
+}
+
+.summoner-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.summoner-tag {
+    font-size: 0.9rem;
+    color: #9ca3af;
+    margin-left: 0.25rem;
+}
+
+.summoner-meta {
+    font-size: 0.85rem;
+    color: #9ca3af;
+    margin-top: 0.2rem;
+}
+

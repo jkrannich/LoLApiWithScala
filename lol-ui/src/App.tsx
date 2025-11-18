@@ -10,45 +10,87 @@ type MatchSummary = {
     assists: number;
     win: boolean;
 };
+type SummonerProfile = {
+  name: string;
+  tag: string;
+  level: number;
+};
 
 function App() {
      const [name, setName] = useState("Thayger");
       const [tag, setTag] = useState("Soul");
       const [region, setRegion] = useState("EUROPE");
+
+      const [summoner, setSummoner] = useState<SummonerProfile | null>(null);
       const [matches, setMatches] = useState<MatchSummary[]>([]);
+
       const [loading, setLoading] = useState(false);
+      const [loadingSummoner, setLoadingSummoner] = useState(false);
       const [error, setError] = useState<string | null>(null);
 
-      const loadMatches = async () => {
+      const loadSummoner = async () => {
+          setLoadingSummoner(true);
+          try {
+              const params = new URLSearchParams({
+                  name,
+                  tag,
+                  region,
+              });
+
+              const res = await fetch(
+                  `http://localhost:8080/summoner?${params.toString()}`
+              );
+
+              if (!res.ok) {
+                  const text = await res.text();
+                  throw new Error(text || `Request failed with ${res.status}`);
+              }
+
+              const data: SummonerProfile = await res.json();
+              setSummoner(data);
+          } catch (e: any) {
+              setError(e.message ?? "Unknown error loading summoner");
+              setSummoner(null);
+          } finally {
+              setLoadingSummoner(false);
+          }
+      };
+
+    const loadMatches = async () => {
         setLoading(true);
         setError(null);
         setMatches([]);
 
         try {
-          const params = new URLSearchParams({
-            name,
-            tag,
-            region,
-            limit: "5",
-          });
+            loadSummoner().catch(() => {
+            });
 
-          const res = await fetch(
-            `http://localhost:8080/matchhistory?${params.toString()}`
-          );
+            const params = new URLSearchParams({
+                name,
+                tag,
+                region,
+                limit: "5",
+            });
 
-          if (!res.ok) {
-            const text = await res.text();
-            throw new Error(text || `Request failed with ${res.status}`);
-          }
+            const res = await fetch(
+                `http://localhost:8080/matchhistory?${params.toString()}`
+            );
 
-          const data: MatchSummary[] = await res.json();
-          setMatches(data);
+            if (!res.ok) {
+                const text = await res.text();
+                throw new Error(text || `Request failed with ${res.status}`);
+            }
+
+            const data: MatchSummary[] = await res.json();
+            setMatches(data);
         } catch (e: any) {
-          setError(e.message ?? "Unknown error");
+            setError(e.message ?? "Unknown error");
         } finally {
-          setLoading(false);
+            setLoading(false);
         }
-      };
+    };
+
+      const isAnyLoading = loading || loadingSummoner;
 
       return (
         <div className="app">
@@ -78,6 +120,20 @@ function App() {
               {loading ? "Loading..." : "Load Match History"}
             </button>
           </div>
+
+            {summoner && (
+                <div className="summoner-card">
+                    <div className="summoner-main">
+                        <div className="summoner-name">
+                            {summoner.name}
+                            <span className="summoner-tag">#{summoner.tag}</span>
+                        </div>
+                        <div className="summoner-meta">
+                            Level {summoner.level} · Region {region}
+                        </div>
+                    </div>
+                </div>
+            )}
 
           {error &&
             <div className="error">
@@ -114,7 +170,7 @@ function App() {
             </table>
           )}
 
-          {!loading && !error && matches.length === 0 && (
+          {!isAnyLoading && !error && matches.length === 0 && (
             <p className="empty-message">No matches loaded yet. Try searching!</p>
           )}
         </div>
