@@ -75,5 +75,36 @@ def main(): Unit = {
           server.sendResponse(exchange, 500, s"""{"error":"${e.getMessage}"}""")
   }
 
+  server.get("/summoner") { exchange =>
+    try
+      val params = server.queryParams(exchange)
+
+      val name = params.getOrElse("name", "")
+      val tag = params.getOrElse("tag", "")
+      val regionStr = params.getOrElse("region", "EUROPE")
+      val platformRegion = PlatformRegion.EUW1
+
+      if name.isEmpty || tag.isEmpty then
+        server.sendResponse(exchange, 400, """{"error":"Missing 'name' or 'tag'"}""")
+
+      val regional = RegionalRoute.valueOf(regionStr)
+
+      val profile = service.getSummonerProfile(regional, platformRegion, name, tag)
+
+      val json =
+        s"""{
+           "name":"${profile.name()}",
+           "tag":"${profile.tag()}",
+           "level":"${profile.level()}"
+        }"""
+
+      server.sendResponse(exchange, 200, json)
+
+    catch
+      case e: Exception =>
+        e.printStackTrace()
+        server.sendResponse(exchange, 500, s"""{"error":"${e.getMessage}"}""")
+  }
+
   server.start()
 }
