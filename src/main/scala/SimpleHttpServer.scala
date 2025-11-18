@@ -23,6 +23,7 @@ class SimpleHttpServer(port: Int):
   def sendResponse(exchange: HttpExchange, status: Int, body: String): Unit =
     val bytes = body.getBytes(StandardCharsets.UTF_8)
     exchange.getResponseHeaders.add("Content-Type", "application/json")
+    exchange.getResponseHeaders.add("Access-Control-Allowed-Origin", "*")
     exchange.sendResponseHeaders(status, bytes.length)
     val os = exchange.getResponseBody
     os.write(bytes)
