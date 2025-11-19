@@ -3,8 +3,6 @@ import core.config.Regions.{PlatformRegion, RegionalRoute}
 import core.config.RiotApiConfig
 import core.http.JavaNetRiotHttp
 import io.github.cdimascio.dotenv.Dotenv
-import wrapper.domain.MatchSummary
-import wrapper.mapping.MatchMapper
 import wrapper.service.RiotLeagueService
 
 import java.time.Duration
@@ -24,6 +22,7 @@ def main(): Unit = {
   val account = riotApi.account().byRiotId(RegionalRoute.EUROPE, "Thayger", "Soul")
   println(account)
   */
+  
 
   val server = new SimpleHttpServer(8080)
 
